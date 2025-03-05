@@ -1,0 +1,178 @@
+.awe-slider-container {
+    position: relative;
+    width: 100%;
+    margin: 40px 0;
+    overflow: hidden;
+    height: 350px;
+}
+
+.awe-slider.awe-fade {
+    gap: 0;
+}
+
+.awe-slider {
+    display: flex;
+    -webkit-transition: -webkit-transform 0.5s ease-in-out;
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    gap: 14px;
+}
+
+.awe-slide {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    -webkit-transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.awe-pagination-wrapper {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    overflow: hidden;
+    text-align: center;
+}
+
+.awe-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.5s ease-in-out;
+    white-space: nowrap;
+    padding: 5px 10px;
+}
+
+.awe-page-link {
+    color: white;
+    cursor: pointer;
+    padding: 5px 15px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    background: rgba(255, 255, 255, 0.2);
+    min-width: 30px;
+    text-align: center;
+}
+
+.awe-page-link.awe-active {
+    background: rgba(255, 255, 255, 0.8);
+    color: black;
+    font-weight: bold;
+}
+
+.awe-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.awe-prev {
+    left: 10px;
+}
+
+.awe-next {
+    right: 10px;
+}
+
+/* Mobile devices (up to 767px) */
+@media (max-width: 767px) {
+    .awe-slider-container {
+        max-width: 100%; /* Full width on mobile */
+        margin: 20px auto; /* Reduce margin */
+        height: 200px; /* Smaller height for mobile */
+    }
+
+    .awe-slider {
+        gap: 8px; /* Smaller gap */
+    }
+
+    .awe-slide {
+        font-size: 16px; /* Smaller font size */
+    }
+
+    .awe-pagination-wrapper {
+        width: 90%; /* Slightly wider to fit content */
+        bottom: 5px; /* Closer to bottom */
+    }
+
+    .awe-pagination {
+        gap: 5px; /* Smaller gap between pagination dots */
+    }
+
+    .awe-page-link {
+        padding: 3px 10px; /* Smaller padding */
+        min-width: 20px; /* Smaller minimum width */
+        font-size: 14px; /* Smaller text */
+    }
+
+    .awe-btn {
+        padding: 8px; /* Slightly smaller but still touch-friendly */
+        font-size: 18px; /* Larger font for visibility */
+    }
+
+    .awe-prev {
+        left: 5px; /* Closer to edge */
+    }
+
+    .awe-next {
+        right: 5px; /* Closer to edge */
+    }
+}
+
+/* Tablet devices (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .awe-slider-container {
+        max-width: 90%; /* Slightly less than full width */
+        margin: 30px auto; /* Moderate margin */
+        height: 300px; /* Moderate height */
+    }
+
+    .awe-slider {
+        gap: 10px; /* Moderate gap */
+    }
+
+    .awe-slide {
+        font-size: 20px; /* Moderate font size */
+    }
+
+    .awe-pagination-wrapper {
+        width: 85%; /* Adjusted width */
+    }
+
+    .awe-pagination {
+        gap: 8px; /* Moderate gap */
+    }
+
+    .awe-page-link {
+        padding: 4px 12px; /* Moderate padding */
+        min-width: 25px; /* Moderate minimum width */
+    }
+
+    .awe-btn {
+        padding: 10px; /* Keep desktop padding */
+    }
+}
+
+/* Desktop devices (1024px and up) */
+@media (min-width: 1024px) {
+    /* Default styles already apply; no changes needed unless specific tweaks desired */
+}
