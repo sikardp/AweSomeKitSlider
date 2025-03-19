@@ -1,28 +1,31 @@
-class AweSomeSlider {
+class AweSomeKitSlider {
     constructor(container, options = {}) {
         this.container = document.querySelector(container);
         if (!this.container) throw new Error(`Container ${container} not found`);
         
         this.slider = this.container.querySelector('.awe-slider');
         if (!this.slider) throw new Error('Slider element not found');
-        
-        const init = () => {
+
+        // Initialize
+        this.init = () => {
             this.slides = [...this.slider.children];
             this.paginationContainer = this.container.querySelector('.awe-pagination');
             this.prevBtn = this.container.querySelector('.awe-prev');
             this.nextBtn = this.container.querySelector('.awe-next');
-            const { 
-                autoplay = false, 
-                interval = 3000, 
-                infinite = false, 
-                arrows = false, 
+            
+            const {
+                autoplay = false,
+                interval = 3000,
+                infinite = false,
+                arrows = false,
                 pagination = false,
-                paginationText = [], 
+                paginationText = [],
                 type = 'slide',
                 slidesPerView = 1,
                 slidesToScroll = 1,
                 breakpoints = {}
             } = options;
+
             this.defaultOptions = {
                 autoplay,
                 interval,
@@ -44,6 +47,8 @@ class AweSomeSlider {
 
             this.applyResponsiveSettings();
             this.setupSlides();
+            this.slider.dataset.slidesPerView = this.slidesPerView;
+            
             if (this.type === 'slide' && this.infinite) this.cloneSlides();
             if (this.type === 'fade') this.setupFade();
             if (this.pagination && this.paginationContainer) this.createPagination();
@@ -57,9 +62,9 @@ class AweSomeSlider {
         };
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
+            document.addEventListener('DOMContentLoaded', this.init);
         } else {
-            init();
+            this.init();
         }
     }
 
@@ -90,6 +95,8 @@ class AweSomeSlider {
         this.stopAutoplay();
         this.applyResponsiveSettings();
         this.setupSlides();
+        this.slider.dataset.slidesPerView = this.slidesPerView;
+        
         if (this.type === 'slide' && this.infinite) {
             this.slider.innerHTML = '';
             this.slides = [...this.container.querySelector('.awe-slider').children];
@@ -167,29 +174,53 @@ class AweSomeSlider {
     }
 
     addArrows() {
-        this.prevBtn.addEventListener('click', () => {
-            this.stopAutoplay();
-            this.prevSlide();
-            this.resetAutoplay();
-        });
+        // Ensure buttons are visible and events are properly bound
+        if (this.prevBtn) {
+            this.prevBtn.style.display = 'block';
+            this.removeEventListeners(this.prevBtn, 'click'); // Prevent multiple listeners
+            this.prevBtn.addEventListener('click', () => {
+                this.stopAutoplay();
+                this.prevSlide();
+                this.resetAutoplay();
+            });
+        }
+        if (this.nextBtn) {
+            this.nextBtn.style.display = 'block';
+            this.removeEventListeners(this.nextBtn, 'click');
+            this.nextBtn.addEventListener('click', () => {
+                this.stopAutoplay();
+                this.nextSlide();
+                this.resetAutoplay();
+            });
+        }
+    }
 
-        this.nextBtn.addEventListener('click', () => {
-            this.stopAutoplay();
-            this.nextSlide();
-            this.resetAutoplay();
-        });
+    // Utility to remove existing event listeners
+    removeEventListeners(element, event) {
+        const clone = element.cloneNode(true);
+        element.parentNode.replaceChild(clone, element);
+        if (event === 'click') {
+            if (element === this.prevBtn) this.prevBtn = clone;
+            if (element === this.nextBtn) this.nextBtn = clone;
+        }
     }
 
     addDragEvents() {
-        this.slider.addEventListener('mousedown', this.startDragging.bind(this));
-        this.slider.addEventListener('mousemove', this.drag.bind(this));
-        this.slider.addEventListener('mouseup', this.stopDragging.bind(this));
-        this.slider.addEventListener('mouseleave', this.stopDragging.bind(this));
-        
-        this.slider.addEventListener('touchstart', this.startDragging.bind(this), { passive: false });
-        this.slider.addEventListener('touchmove', this.drag.bind(this), { passive: false });
-        this.slider.addEventListener('touchend', this.stopDragging.bind(this));
-        this.slider.addEventListener('touchcancel', this.stopDragging.bind(this));
+        const events = {
+            start: ['mousedown', 'touchstart'],
+            move: ['mousemove', 'touchmove'],
+            end: ['mouseup', 'touchend', 'mouseleave', 'touchcancel']
+        };
+
+        events.start.forEach(ev => 
+            this.slider.addEventListener(ev, this.startDragging.bind(this), { passive: false })
+        );
+        events.move.forEach(ev => 
+            this.slider.addEventListener(ev, this.drag.bind(this), { passive: false })
+        );
+        events.end.forEach(ev => 
+            this.slider.addEventListener(ev, this.stopDragging.bind(this))
+        );
     }
 
     startDragging(e) {
@@ -200,6 +231,7 @@ class AweSomeSlider {
         if (this.type === 'slide') {
             this.slider.style.transition = 'none';
         }
+        e.preventDefault();
     }
 
     drag(e) {
@@ -223,7 +255,7 @@ class AweSomeSlider {
         if (this.type === 'slide') {
             const movedBy = this.currentTranslate - this.prevTranslate;
             const slideWidthPx = (this.slider.offsetWidth - this.gap * (this.slidesPerView - 1)) / this.slidesPerView;
-            const threshold = slideWidthPx / 2;
+            const threshold = slideWidthPx * 0.3;
             
             this.slider.style.transition = 'transform 0.5s ease-in-out';
             if (movedBy < -threshold) {
@@ -235,17 +267,15 @@ class AweSomeSlider {
             }
         } else if (this.type === 'fade') {
             const diff = this.getPositionX(e) - this.startPos;
-            if (diff < -50) this.nextSlide();
-            else if (diff > 50) this.prevSlide();
+            if (diff < -30) this.nextSlide();
+            else if (diff > 30) this.prevSlide();
         }
         
         this.resetAutoplay();
     }
 
     getPositionX(e) {
-        if (e.type.includes('mouse')) return e.pageX;
-        if (e.touches && e.touches.length > 0) return e.touches[0].pageX;
-        return 0;
+        return e.type.includes('mouse') ? e.pageX : (e.touches?.[0]?.pageX || e.changedTouches?.[0]?.pageX || 0);
     }
 
     updatePagination() {
@@ -304,9 +334,10 @@ class AweSomeSlider {
     nextSlide() {
         this.index += this.slidesToScroll;
         if (this.type === 'slide') {
-            this.slider.style.transition = 'transform 0.5s ease-in-out';
             const maxIndex = this.slides.length - this.slidesPerView;
             if (this.infinite && this.index >= maxIndex) {
+                this.slider.style.transition = 'transform 0.5s ease-in-out';
+                this.updateSlidePosition();
                 setTimeout(() => {
                     this.slider.style.transition = 'none';
                     this.index = this.slidesPerView;
@@ -328,8 +359,9 @@ class AweSomeSlider {
     prevSlide() {
         this.index -= this.slidesToScroll;
         if (this.type === 'slide') {
-            this.slider.style.transition = 'transform 0.5s ease-in-out';
             if (this.infinite && this.index < this.slidesPerView) {
+                this.slider.style.transition = 'transform 0.5s ease-in-out';
+                this.updateSlidePosition();
                 setTimeout(() => {
                     this.slider.style.transition = 'none';
                     this.index = this.slides.length - this.slidesPerView * 2;
@@ -351,7 +383,6 @@ class AweSomeSlider {
     goToSlide(index) {
         this.index = index;
         if (this.type === 'slide') {
-            this.slider.style.transition = 'transform 0.5s ease-in-out';
             const maxIndex = this.slides.length - this.slidesPerView;
             if (!this.infinite && this.index > maxIndex) this.index = maxIndex;
             if (!this.infinite && this.index < 0) this.index = 0;
@@ -381,74 +412,3 @@ class AweSomeSlider {
         }
     }
 }
-
-// Slider initializations (unchanged)
-new AweSomeSlider('#slider1', { 
-    autoplay: false, 
-    infinite: false, 
-    arrows: false, 
-    pagination: false, 
-    type: 'slide',
-    slidesPerView: 1,
-    slidesToScroll: 1,
-    breakpoints: {
-        768: { slidesPerView: 2 },
-        1024: { slidesPerView: 3 }
-    }
-});
-
-new AweSomeSlider('#slider2', { 
-    autoplay: false, 
-    infinite: false, 
-    arrows: false, 
-    pagination: false, 
-    type: 'fade',
-    slidesPerView: 1,
-    slidesToScroll: 1,
-    breakpoints: {
-        768: { slidesToScroll: 2 },
-        1024: { slidesToScroll: 1 }
-    }
-});
-
-new AweSomeSlider('#slider3', { 
-    autoplay: false, 
-    infinite: true, 
-    arrows: true, 
-    pagination: false, 
-    type: 'slide',
-    slidesPerView: 2,
-    slidesToScroll: 1,
-    breakpoints: {
-        768: { slidesPerView: 3 },
-        1024: { slidesPerView: 4 }
-    }
-});
-
-new AweSomeSlider('#slider4', { 
-    autoplay: false, 
-    infinite: true, 
-    arrows: true, 
-    pagination: false, 
-    type: 'fade',
-    slidesPerView: 1,
-    slidesToScroll: 2,
-    breakpoints: {
-        768: { slidesToScroll: 1 },
-        1024: { slidesToScroll: 3 }
-    }
-});
-
-new AweSomeSlider('#slider5', { 
-    autoplay: true, 
-    infinite: true, 
-    arrows: false, 
-    pagination: false, 
-    type: 'slide',
-    slidesPerView: 3,
-    slidesToScroll: 1,
-    breakpoints: {
-        768: { slidesPerView: 2 },
-        1024: { slidesPerView: 4 }
-    }
-});
