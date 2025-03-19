@@ -1,12 +1,19 @@
 {
   "name": "awesomekitslider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A lightweight and responsive slider package",
   "main": "dist/AweSomeKitSlider.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "author": "SIKARDP",
   "license": "MIT",
-  "keywords": ["slider", "carousel", "javascript", "responsive"],
+  "keywords": [
+    "slider",
+    "carousel",
+    "javascript",
+    "responsive"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/sikardp/AweSomeKitSlider.git"
